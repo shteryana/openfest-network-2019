@@ -1,0 +1,96 @@
+- name: "get git version"
+  shell: git log -1 '--date=format:%Y-%m-%d %H:%M' '--pretty=format:%cd %h'
+  register: git_version
+  delegate_to: localhost
+  changed_when: False
+
+- name: set timezone
+  timezone: name={{ timezone }}
+
+- name: "configure sources.list"
+  template:
+    src: sources.list.j2
+    dest: /etc/apt/sources.list
+    owner: root
+    group: root
+    mode: 0644
+  register: apt_sources
+
+- name: "run apt update if we have modified the sources"
+  apt:
+    update_cache: yes
+  when: apt_sources.changed
+
+- name: "run apt update if the cache is is stale"
+  apt:
+    update_cache: yes
+    cache_valid_time: 86400
+
+- name: "add ssh keys to root"
+  authorized_key:
+    user: root
+    key: "{{ lookup('file', '../../access/ssh-keys/'+item+'.key') }}"
+  with_items: "{{ ssh_users }}"
+
+- name: "configure root user"
+  user:
+    name: root
+    shell: /bin/bash
+    password: ""
+
+- name: "disable ssh password login for root"
+  replace: dest=/etc/ssh/sshd_config regexp='^PermitRootLogin\ yes$' replace='PermitRootLogin without-password'
+  notify: reload ssh
+
+- name: "disable ssh password login for everyone"
+  lineinfile: dest=/etc/ssh/sshd_config regexp="^PasswordAuthentication" line="PasswordAuthentication no" state=present
+  notify: reload ssh
+
+- name: "Install packages"
+  apt:
+    state: latest
+    install_recommends: no
+    package:
+      - apt-transport-https
+      - bash-completion
+      - binutils
+      - ca-certificates
+      - curl
+      - ethtool
+      - file
+      - git
+      - htop
+      - ifmetric
+      - iftop
+      - inotify-tools
+      - iotop
+      - less
+      - libcap2-bin
+      - lsof
+      - ltrace
+      - mediainfo
+      - mtr-tiny
+      - patch
+      - screen
+      - sipcalc
+      - strace
+      - sudo
+      - tcpdump
+      - vim
+      - vnstat
+
+- name: "Install ntp"
+  apt:
+    state: latest
+    install_recommends: no
+    package:
+      - ntp
+
+- name: "Configure ntp"
+  template:
+    src: ntp.conf.j2
+    dest: /etc/ntp.conf
+    owner: root
+    group: root
+    mode: 0640
+  notify: restart ntp
