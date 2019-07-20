@@ -29,6 +29,7 @@ func main() {
 	fetchPgp := parser.Flag("p", "pgp-keys", &argparse.Options{Required: false, Help: "Fetch configured PGP key ids", Default: false})
 	quiet := parser.Flag("q", "quiet", &argparse.Options{Required: false, Help: "Skip output to stdout", Default: false})
 	ghTeam := parser.String("t", "team", &argparse.Options{Required: false, Help: "Github Team name, 'all' for all members of the organization", Default: "NOC"})
+	verbose := parser.Flag("v", "verbose", &argparse.Options{Required: false, Help: "Verbose output: print keys to stdout", Default: false})
 
 	// Parse input
 	err := parser.Parse(os.Args)
@@ -37,14 +38,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	fi, err := os.Lstat(*keysDir)
-	if err != nil {
-		fmt.Println(*keysDir, ": target directory error :", err)
-		os.Exit(1)
-	} else {
-		if fi.Mode().IsDir() == false {
-			fmt.Println(*keysDir, ": target directory error : not a directory - ", fi.Mode())
+	if *verbose == false {
+		fi, err := os.Lstat(*keysDir)
+		if err != nil {
+			fmt.Println(*keysDir, ": target directory error :", err)
 			os.Exit(1)
+		} else {
+			if fi.Mode().IsDir() == false {
+				fmt.Println(*keysDir, ": target directory error : not a directory - ", fi.Mode())
+				os.Exit(1)
+			}
 		}
 	}
 
@@ -59,7 +62,7 @@ func main() {
 	teamMembers := fetchUsers(client, ghOrganization, ghTeam)
 	for _, user := range teamMembers {
 		if *quiet == false {
-			fmt.Println("Fetching keys for ", *user)
+			fmt.Println("Fetching keys for", *user)
 		}
 		var sshKeys bytes.Buffer
 		var pgpKeys bytes.Buffer
@@ -80,7 +83,7 @@ func main() {
 			}
 
 			for _, key := range keys {
-				if *quiet == false {
+				if *verbose == true {
 					fmt.Println(*key.Key)
 				}
 				sshKeys.WriteString(*key.Key)
@@ -93,11 +96,11 @@ func main() {
 			nextPage = rsp.NextPage
 		}
 
-		if *quiet == false {
+		if *quiet == false && *verbose == false {
 			fmt.Println("Writing to", *keysDir+"/"+*user+".key")
 		}
 		err := ioutil.WriteFile(*keysDir+"/"+*user+".key", sshKeys.Bytes(), 0444)
-		if err != nil {
+		if err != nil && *verbose == false {
 			fmt.Println(*user+".key error ", err)
 		}
 
@@ -118,7 +121,7 @@ func main() {
 				}
 
 				for _, key := range keys {
-					if *quiet == false {
+					if *verbose == true {
 						fmt.Println(*key.KeyID)
 					}
 					pgpKeys.WriteString(*key.KeyID)
@@ -130,11 +133,11 @@ func main() {
 				}
 				nextPage = rsp.NextPage
 			}
-			if *quiet == false {
+			if *quiet == false && *verbose == false {
 				fmt.Println("Writing to", *keysDir+"/"+*user+".gpg")
 			}
 			err = ioutil.WriteFile(*keysDir+"/"+*user+".gpg", pgpKeys.Bytes(), 0444)
-			if err != nil {
+			if err != nil && *verbose == false {
 				fmt.Println(*user+".gpg error ", err)
 			}
 		}
