@@ -55,8 +55,8 @@ func main() {
 
 	client := github.NewClient(tc)
 
-	var nocTeam *github.Team
-	var nocMembers []*string
+	var targetTeam *github.Team
+	var teamMembers []*string
 
 	for nextPage := 0; ; {
 		// list all teams for the specified org
@@ -64,17 +64,17 @@ func main() {
 		teams, rsp, err := client.Teams.ListTeams(ctx, *ghOrganization, opt)
 
 		if err != nil {
-			fmt.Println("client.ListTeams error: %v", err)
+			fmt.Println("client.ListTeams error: ", err)
 			os.Exit(-1)
 		}
 
 		if rsp == nil {
-			fmt.Println("client.Repositories.List returned empty response: %v", err)
+			fmt.Println("client.ListTeams returned empty response: ", err)
 		}
 
 		for _, team := range teams {
 			if *team.Name == *ghTeam {
-				nocTeam = team
+				targetTeam = team
 				break
 			}
 		}
@@ -85,8 +85,8 @@ func main() {
 		nextPage = rsp.NextPage
 	}
 
-	if nocTeam == nil {
-		fmt.Println("NOC team not found in OpenFest")
+	if targetTeam == nil {
+		fmt.Println(*ghTeam , " team not found in ", *ghOrganization)
 		os.Exit(2)
 	}
 
@@ -97,19 +97,19 @@ func main() {
 			ListOptions: github.ListOptions{nextPage, 50},
 		}
 
-		users, rsp, err := client.Teams.ListTeamMembers(context.Background(), *nocTeam.ID, opt)
+		users, rsp, err := client.Teams.ListTeamMembers(context.Background(), *targetTeam.ID, opt)
 
 		if err != nil {
-			fmt.Println("client.Teams.ListTeamMembers %v", err)
+			fmt.Println("client.Teams.ListTeamMembers ", err)
 			os.Exit(-1)
 		}
 
 		if rsp == nil {
-			fmt.Println("client.Teams.ListTeamMembers: %v", err)
+			fmt.Println("client.Teams.ListTeamMembers: ", err)
 		}
 
 		for _, user := range users {
-			nocMembers = append(nocMembers, user.Login)
+			teamMembers = append(teamMembers, user.Login)
 		}
 
 		if rsp.NextPage == 0 || nextPage == rsp.NextPage {
@@ -118,7 +118,7 @@ func main() {
 		nextPage = rsp.NextPage
 	}
 
-	for _, user := range nocMembers {
+	for _, user := range teamMembers {
 		if *quiet == false {
 			fmt.Println("Fetching keys for ", *user)
 		}
@@ -131,12 +131,12 @@ func main() {
 			keys, rsp, err := client.Users.ListKeys(ctx, *user, opt)
 
 			if err != nil {
-				fmt.Println("client.Users.ListKeys error: %v", err)
+				fmt.Println("client.Users.ListKeys error: ", err)
 				os.Exit(-1)
 			}
 
 			if rsp == nil {
-				fmt.Println("Users.ListKeyss returned empty response: %v", err)
+				fmt.Println("Users.ListKeys returned empty response: ", err)
 			}
 
 			for _, key := range keys {
@@ -158,7 +158,7 @@ func main() {
 		}
 		err := ioutil.WriteFile(*keysDir + "/" + *user+".key", sshKeys.Bytes(), 0444)
 		if err != nil {
-			fmt.Println(*user+".key error %v", err)
+			fmt.Println(*user+".key error ", err)
 		}
 	}
 
