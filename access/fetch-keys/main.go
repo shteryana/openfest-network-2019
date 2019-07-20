@@ -38,7 +38,7 @@ func main() {
 	}
 
 	fi, err := os.Lstat(*keysDir)
-	if err != nil  {
+	if err != nil {
 		fmt.Println(*keysDir, ": target directory error :", err)
 		os.Exit(1)
 	} else {
@@ -55,7 +55,6 @@ func main() {
 	tc := oauth2.NewClient(ctx, ts)
 
 	client := github.NewClient(tc)
-
 
 	teamMembers := fetchUsers(client, ghOrganization, ghTeam)
 	for _, user := range teamMembers {
@@ -95,9 +94,9 @@ func main() {
 		}
 
 		if *quiet == false {
-			fmt.Println("Writing to", *keysDir + "/" + *user+".key")
+			fmt.Println("Writing to", *keysDir+"/"+*user+".key")
 		}
-		err := ioutil.WriteFile(*keysDir + "/" + *user+".key", sshKeys.Bytes(), 0444)
+		err := ioutil.WriteFile(*keysDir+"/"+*user+".key", sshKeys.Bytes(), 0444)
 		if err != nil {
 			fmt.Println(*user+".key error ", err)
 		}
@@ -132,9 +131,9 @@ func main() {
 				nextPage = rsp.NextPage
 			}
 			if *quiet == false {
-				fmt.Println("Writing to", *keysDir + "/" + *user+".gpg")
+				fmt.Println("Writing to", *keysDir+"/"+*user+".gpg")
 			}
-			err = ioutil.WriteFile(*keysDir + "/" + *user+".gpg", pgpKeys.Bytes(), 0444)
+			err = ioutil.WriteFile(*keysDir+"/"+*user+".gpg", pgpKeys.Bytes(), 0444)
 			if err != nil {
 				fmt.Println(*user+".gpg error ", err)
 			}
@@ -151,7 +150,7 @@ func fetchUsers(client *github.Client, org *string, team *string) (teamMembers [
 		for nextPage := 0; ; {
 			// list all members for the given organization's team
 			opt := &github.ListMembersOptions{
-				PublicOnly:        false,
+				PublicOnly:  false,
 				ListOptions: github.ListOptions{nextPage, 50},
 			}
 
@@ -204,7 +203,7 @@ func fetchUsers(client *github.Client, org *string, team *string) (teamMembers [
 		}
 
 		if targetTeam == nil {
-			fmt.Println(*team , " team not found in ", *org)
+			fmt.Println(*team, " team not found in ", *org)
 			os.Exit(2)
 		}
 
