@@ -64,12 +64,12 @@ func main() {
 		teams, rsp, err := client.Teams.ListTeams(ctx, *ghOrganization, opt)
 
 		if err != nil {
-			fmt.Errorf("client.ListTeams error: %v", err)
+			fmt.Println("client.ListTeams error: %v", err)
 			os.Exit(-1)
 		}
 
 		if rsp == nil {
-			fmt.Errorf("client.Repositories.List returned empty response: %v", err)
+			fmt.Println("client.Repositories.List returned empty response: %v", err)
 		}
 
 		for _, team := range teams {
@@ -86,7 +86,7 @@ func main() {
 	}
 
 	if nocTeam == nil {
-		fmt.Errorf("NOC team not found in OpenFest")
+		fmt.Println("NOC team not found in OpenFest")
 		os.Exit(2)
 	}
 
@@ -100,12 +100,12 @@ func main() {
 		users, rsp, err := client.Teams.ListTeamMembers(context.Background(), *nocTeam.ID, opt)
 
 		if err != nil {
-			fmt.Errorf("client.Teams.ListTeamMembers %v", err)
+			fmt.Println("client.Teams.ListTeamMembers %v", err)
 			os.Exit(-1)
 		}
 
 		if rsp == nil {
-			fmt.Errorf("client.Teams.ListTeamMembers: %v", err)
+			fmt.Println("client.Teams.ListTeamMembers: %v", err)
 		}
 
 		for _, user := range users {
@@ -131,12 +131,12 @@ func main() {
 			keys, rsp, err := client.Users.ListKeys(ctx, *user, opt)
 
 			if err != nil {
-				fmt.Errorf("client.Users.ListKeys error: %v", err)
+				fmt.Println("client.Users.ListKeys error: %v", err)
 				os.Exit(-1)
 			}
 
 			if rsp == nil {
-				fmt.Errorf("Users.ListKeyss returned empty response: %v", err)
+				fmt.Println("Users.ListKeyss returned empty response: %v", err)
 			}
 
 			for _, key := range keys {
@@ -153,10 +153,12 @@ func main() {
 			nextPage = rsp.NextPage
 		}
 
-		fmt.Println("Writing to", *keysDir + *user+".key")
+		if *quiet == false {
+			fmt.Println("Writing to", *keysDir + "/" + *user+".key")
+		}
 		err := ioutil.WriteFile(*keysDir + "/" + *user+".key", sshKeys.Bytes(), 0444)
 		if err != nil {
-			fmt.Errorf(*user+".key error %v", err)
+			fmt.Println(*user+".key error %v", err)
 		}
 	}
 
