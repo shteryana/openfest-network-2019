@@ -25,8 +25,9 @@ func main() {
 	parser := argparse.NewParser("sshkeys", "Fetch SSH keys for a Github team members")
 	authToken := parser.String("a", "authtoken", &argparse.Options{Required: false, Help: "Github Auth token", Default: AuthToken})
 	keysDir := parser.String("d", "directory", &argparse.Options{Required: false, Help: "Path where to store the key files", Default: "./"})
-	quiet := parser.Flag("q", "quiet", &argparse.Options{Required: false, Help: "Skip output to stdout", Default: false})
 	ghOrganization := parser.String("o", "org", &argparse.Options{Required: false, Help: "Github Organization name", Default: "OpenFest"})
+	fetchPgp := parser.Flag("p", "pgp-keys", &argparse.Options{Required: false, Help: "Fetch configured PGP key ids", Default: false})
+	quiet := parser.Flag("q", "quiet", &argparse.Options{Required: false, Help: "Skip output to stdout", Default: false})
 	ghTeam := parser.String("t", "team", &argparse.Options{Required: false, Help: "Github Team name, 'all' for all members of the organization", Default: "NOC"})
 
 	// Parse input
@@ -62,6 +63,7 @@ func main() {
 			fmt.Println("Fetching keys for ", *user)
 		}
 		var sshKeys bytes.Buffer
+		var pgpKeys bytes.Buffer
 
 		for nextPage := 0; ; {
 
@@ -98,6 +100,44 @@ func main() {
 		err := ioutil.WriteFile(*keysDir + "/" + *user+".key", sshKeys.Bytes(), 0444)
 		if err != nil {
 			fmt.Println(*user+".key error ", err)
+		}
+
+		if *fetchPgp == true {
+			for nextPage := 0; ; {
+
+				// list all teams an org for the current user
+				opt := &github.ListOptions{nextPage, 50}
+				keys, rsp, err := client.Users.ListGPGKeys(ctx, *user, opt)
+
+				if err != nil {
+					fmt.Println("client.Users.ListGPGKeys error: ", err)
+					os.Exit(-1)
+				}
+
+				if rsp == nil {
+					fmt.Println("Users.ListGPGKeys returned empty response: ", err)
+				}
+
+				for _, key := range keys {
+					if *quiet == false {
+						fmt.Println(*key.KeyID)
+					}
+					pgpKeys.WriteString(*key.KeyID)
+					pgpKeys.WriteString("\n")
+				}
+
+				if rsp.NextPage == 0 || nextPage == rsp.NextPage {
+					break
+				}
+				nextPage = rsp.NextPage
+			}
+			if *quiet == false {
+				fmt.Println("Writing to", *keysDir + "/" + *user+".gpg")
+			}
+			err = ioutil.WriteFile(*keysDir + "/" + *user+".gpg", pgpKeys.Bytes(), 0444)
+			if err != nil {
+				fmt.Println(*user+".gpg error ", err)
+			}
 		}
 	}
 
