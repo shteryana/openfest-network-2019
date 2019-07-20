@@ -9,6 +9,3 @@ Run
 ```
 ./fetch-keys --help
 ```
-
-TODO: This polutes the current working directory with `{user}.key` files - add
-a command line option for custom output target dir
