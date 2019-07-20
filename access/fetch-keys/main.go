@@ -27,12 +27,24 @@ func main() {
 	ghOrganization := parser.String("o", "org", &argparse.Options{Required: false, Help: "Github Organization name", Default: "OpenFest"})
 	authToken := parser.String("a", "authtoken", &argparse.Options{Required: false, Help: "Github Auth token", Default: AuthToken})
 	quiet := parser.Flag("q", "quiet", &argparse.Options{Required: false, Help: "Skip output to stdout", Default: false})
+	keysDir := parser.String("d", "directory", &argparse.Options{Required: false, Help: "Path where to store the key files", Default: "./"})
 
 	// Parse input
 	err := parser.Parse(os.Args)
 	if err != nil {
 		fmt.Print(parser.Usage(err))
 		os.Exit(1)
+	}
+
+	fi, err := os.Lstat(*keysDir)
+	if err != nil  {
+		fmt.Println(*keysDir, ": target directory error :", err)
+		os.Exit(1)
+	} else {
+		if fi.Mode().IsDir() == false {
+			fmt.Println(*keysDir, ": target directory error : not a directory - ", fi.Mode())
+			os.Exit(1)
+		}
 	}
 
 	ctx := context.Background()
@@ -141,7 +153,8 @@ func main() {
 			nextPage = rsp.NextPage
 		}
 
-		err := ioutil.WriteFile(*user+".key", sshKeys.Bytes(), 0444)
+		fmt.Println("Writing to", *keysDir + *user+".key")
+		err := ioutil.WriteFile(*keysDir + "/" + *user+".key", sshKeys.Bytes(), 0444)
 		if err != nil {
 			fmt.Errorf(*user+".key error %v", err)
 		}
