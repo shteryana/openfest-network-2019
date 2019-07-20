@@ -26,6 +26,7 @@ func main() {
 	ghTeam := parser.String("t", "team", &argparse.Options{Required: false, Help: "Github Team name", Default: "NOC"})
 	ghOrganization := parser.String("o", "org", &argparse.Options{Required: false, Help: "Github Organization name", Default: "OpenFest"})
 	authToken := parser.String("a", "authtoken", &argparse.Options{Required: false, Help: "Github Auth token", Default: AuthToken})
+	quiet := parser.Flag("q", "quiet", &argparse.Options{Required: false, Help: "Skip output to stdout", Default: false})
 
 	// Parse input
 	err := parser.Parse(os.Args)
@@ -106,7 +107,9 @@ func main() {
 	}
 
 	for _, user := range nocMembers {
-		fmt.Println("Fetching keys for ", *user)
+		if *quiet == false {
+			fmt.Println("Fetching keys for ", *user)
+		}
 		var sshKeys bytes.Buffer
 
 		for nextPage := 0; ; {
@@ -125,7 +128,9 @@ func main() {
 			}
 
 			for _, key := range keys {
-				fmt.Println(*key.Key)
+				if *quiet == false {
+					fmt.Println(*key.Key)
+				}
 				sshKeys.WriteString(*key.Key)
 				sshKeys.WriteString("\n")
 			}
