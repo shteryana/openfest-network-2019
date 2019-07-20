@@ -23,11 +23,11 @@ import (
 func main() {
 
 	parser := argparse.NewParser("sshkeys", "Fetch SSH keys for a Github team members")
-	ghTeam := parser.String("t", "team", &argparse.Options{Required: false, Help: "Github Team name", Default: "NOC"})
-	ghOrganization := parser.String("o", "org", &argparse.Options{Required: false, Help: "Github Organization name", Default: "OpenFest"})
 	authToken := parser.String("a", "authtoken", &argparse.Options{Required: false, Help: "Github Auth token", Default: AuthToken})
-	quiet := parser.Flag("q", "quiet", &argparse.Options{Required: false, Help: "Skip output to stdout", Default: false})
 	keysDir := parser.String("d", "directory", &argparse.Options{Required: false, Help: "Path where to store the key files", Default: "./"})
+	quiet := parser.Flag("q", "quiet", &argparse.Options{Required: false, Help: "Skip output to stdout", Default: false})
+	ghOrganization := parser.String("o", "org", &argparse.Options{Required: false, Help: "Github Organization name", Default: "OpenFest"})
+	ghTeam := parser.String("t", "team", &argparse.Options{Required: false, Help: "Github Team name", Default: "NOC"})
 
 	// Parse input
 	err := parser.Parse(os.Args)
