@@ -17,17 +17,15 @@ ID | IP/Range | Name | Notes
 IP | Name | Notes
 ---|------|------
 .1 | eric | router/services
-.2 | eagle | backup
 .11 | coresw | CORE
 .21 | vocsw-A | video team switch room A
 .22 | vocsw-B | video team switch room B
-.27 | vocsw-C | video team switch room C
-.23 | nocsw | NOC/team switch
-.24 | wssw1 | workshop area switch
-.25 | wssw2 | workshop area switch
-.26 | receptionsw | reception area switch
-.28 | connectionsw | special connection switch (not confirmed)
-.29 | fl2sw | Second floor trunk switch
+.23 | vocsw-C | video team switch room C
+.24 | vocsw-D | video team switch room D
+.25 | receptionsw | Reception switch
+.26 | teamsw | switch for teamroom (unconfirmed)
+.27 | fl0sw | floor0 interconnecting switch
+.28 | nocsw | NOC
 .50 | ap-cf-f-l | ap conf floor left foaier
 .51 | ap-cf-f-r | ap conf floor right foaier
 .52 | ap-cf-mr-1 | ap conf floor main room
