@@ -5,6 +5,11 @@ ssh_users:
   - zeridon
   - maniax
   - arcopix
+  - hackman
+  - lz1irq
+  - shteryana
+  - tochev
+  - Yasen6275
 
 timezone: "Europe/Sofia"
 

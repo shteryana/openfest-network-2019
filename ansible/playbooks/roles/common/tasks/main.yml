@@ -29,7 +29,7 @@
 - name: "add ssh keys to root"
   authorized_key:
     user: root
-    key: "{{ lookup('file', '../../access/ssh-keys/'+item+'.key') }}"
+    key: "{{ lookup('file', '../access/ssh-keys/'+item+'.key') }}"
   with_items: "{{ ssh_users }}"
 
 - name: "configure root user"
