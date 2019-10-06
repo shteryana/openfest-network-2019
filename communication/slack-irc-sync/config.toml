@@ -68,6 +68,9 @@
 	[[gateway.in]]
 		account="api.local"
 		channel="api"
+	[[gateway.out]]
+		account="slack.openfest"
+		channel="noc"
 
 [[gateway]]
 	name="si-of-video"
