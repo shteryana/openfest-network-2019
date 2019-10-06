@@ -2,7 +2,7 @@ Core switch ports + panel
 =========================
 
 port    | panel  | deviceport  | name
---------|--------|------------------
+--------|--------|-------------|-----------------
 Gi1/0/1 |        |             | DEBUG
 Gi1/0/2 |        |             | DEBUG/trunk
 Gi1/0/3 |        | onboard eth | vin
