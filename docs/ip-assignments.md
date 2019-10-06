@@ -28,12 +28,11 @@ IP | Name | Notes
 .28 | nocsw | NOC
 .50 | ap-cf-f-l | ap conf floor left foaier
 .51 | ap-cf-f-r | ap conf floor right foaier
-.52 | ap-cf-mr-1 | ap conf floor main room
-.53 | ap-cf-mr-2 | ap conf floor main room
-.54 | ap-cf-mr-3 | ap conf floor main room
-.55 | ap-cf-mr-4 | ap conf floor main room
-.56 | ap-cf-sr-1 | ap conf floor second room
-.57 | ap-cf-sr-2 | ap conf floor second room
+.52 | ap-cf-a1  | ap room A stage
+.53 | ap-cf-a2  | ap room A back
+.54 | ap-cf-b1  | ap room B stage
+.55 | ap-cf-c1  | ap room C stage
+.55 | ap-cf-srv  | ap server room main floor
 .58 | ap-cf-ch   | ap conf floor chillout area
 .59 | ap-cf-qws  | ap conf floor quiet workshop area
 .60 | ap-ws-ws1  | ap workshop floor workshop area
